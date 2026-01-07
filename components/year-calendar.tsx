@@ -139,6 +139,7 @@ export function YearCalendar({
   writableCalendars = [],
   writableAccountsWithCalendars = [],
   showDaysOfWeek = false,
+  alignWeekends = false,
 }: {
   year: number;
   events: AllDayEvent[];
@@ -163,13 +164,58 @@ export function YearCalendar({
     list: CalendarListItem[];
   }>;
   showDaysOfWeek?: boolean;
+  alignWeekends?: boolean;
 }) {
   const todayKey = formatDateKey(new Date());
   const dateMap = useMemo(() => expandEventsToDateMap(events), [events]);
-  const days = useMemo(() => generateYearDays(year), [year]);
+  const rawDays = useMemo(() => generateYearDays(year), [year]);
+  const days = useMemo(() => {
+    if (!alignWeekends) return rawDays;
+
+    // Find the Monday of the week containing January 1st
+    const jan1 = new Date(year, 0, 1);
+    const dayOfWeek = jan1.getDay(); // 0=Sunday, 1=Monday, ..., 6=Saturday
+    // Convert to Monday-based: Monday=0, Tuesday=1, ..., Sunday=6
+    const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+
+    // End at December 31st (don't extend to next year)
+    const dec31 = new Date(year, 11, 31);
+    const lastDayOfWeek = dec31.getDay();
+    // Convert to Monday-based: Monday=0, Tuesday=1, ..., Sunday=6
+    // Calculate how many days after Dec 31 to complete the week (to Sunday)
+    const daysToSunday = lastDayOfWeek === 0 ? 0 : 7 - lastDayOfWeek;
+
+    // Generate all days from Monday of Jan 1 week to Sunday of Dec 31 week
+    // Use null for days before January 1st and after December 31st
+    const result: Array<{ key: string; date: Date } | null> = [];
+    const startDate = new Date(jan1);
+    startDate.setDate(startDate.getDate() - daysFromMonday);
+    const endDate = new Date(dec31);
+    endDate.setDate(endDate.getDate() + daysToSunday);
+
+    for (
+      let d = new Date(startDate);
+      d <= endDate;
+      d.setDate(d.getDate() + 1)
+    ) {
+      const date = new Date(d);
+      // If date is before Jan 1 or after Dec 31, use null (empty cell)
+      if (date < jan1 || date > dec31) {
+        result.push(null);
+      } else {
+        result.push({ key: formatDateKey(date), date });
+      }
+    }
+
+    return result;
+  }, [rawDays, alignWeekends, year]);
   const dayIndexByKey = useMemo(() => {
     const map = new Map<string, number>();
-    days.forEach((d, i) => map.set(d.key, i));
+    days.forEach((d, i) => {
+      if (d !== null) {
+        map.set(d.key, i);
+      }
+    });
     return map;
   }, [days]);
   const gridRef = React.useRef<HTMLDivElement | null>(null);
@@ -207,18 +253,37 @@ export function YearCalendar({
 
   React.useEffect(() => {
     function onResize() {
-      setGridDims(
-        computeSquareGridColumns(
-          days.length,
-          window.innerWidth,
-          window.innerHeight
-        )
-      );
+      if (alignWeekends) {
+        // Fixed 28 columns (4 weeks × 7 days)
+        const gap = 1;
+        const usableWidth = window.innerWidth - 2; // account for border
+        const widthBasedCell = Math.max(
+          10,
+          Math.floor((usableWidth - 27 * gap) / 28)
+        );
+        const rows = Math.ceil(days.length / 28);
+        const usableHeight = window.innerHeight - 2; // account for border
+        const heightBasedCell = Math.max(
+          10,
+          Math.floor((usableHeight - (rows - 1) * gap) / rows)
+        );
+        // Use the smaller of the two to ensure it fits both dimensions
+        const cellSize = Math.min(widthBasedCell, heightBasedCell);
+        setGridDims({ cols: 28, cell: cellSize });
+      } else {
+        setGridDims(
+          computeSquareGridColumns(
+            days.length,
+            window.innerWidth,
+            window.innerHeight
+          )
+        );
+      }
     }
     onResize();
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
-  }, [days.length]);
+  }, [days.length, alignWeekends]);
   React.useLayoutEffect(() => {
     const grid = gridRef.current;
     if (!grid) return;
@@ -341,7 +406,18 @@ export function YearCalendar({
             gap: "1px",
           }}
         >
-          {days.map(({ key, date }) => {
+          {days.map((day, index) => {
+            if (day === null) {
+              // Empty cell for days before January 1st or after December 31st
+              return (
+                <div
+                  key={`empty-${index}`}
+                  data-day-cell="1"
+                  className="relative bg-muted/30 p-1 min-w-0 min-h-0 overflow-hidden"
+                />
+              );
+            }
+            const { key, date } = day;
             const isToday = key === todayKey;
             const dayEvents = dateMap.get(key) || [];
             const isFirstOfMonth = date.getDate() === 1;
@@ -366,22 +442,15 @@ export function YearCalendar({
                 {isFirstOfMonth && (
                   <div className="absolute top-1 left-1 text-[10px] leading-none uppercase tracking-wide text-primary">
                     {monthShort[date.getMonth()]}
-                    {showDaysOfWeek && (
-                      <span className="text-[10px] opacity-60">
-                        {dayOfWeekShort[date.getDay()]}
-                      </span>
-                    )}
                   </div>
                 )}
                 <div
                   className={cn(
-                    "mb-0.5 text-[10px] leading-none text-muted-foreground",
-                    isToday && "text-primary font-semibold",
-                    isFirstOfMonth && showDaysOfWeek && "ml-11",
-                    isFirstOfMonth && !showDaysOfWeek && "ml-6"
+                    "absolute top-1 right-1 text-[10px] leading-none text-muted-foreground text-right",
+                    isToday && "text-primary font-semibold"
                   )}
                 >
-                  {!isFirstOfMonth && showDaysOfWeek && (
+                  {showDaysOfWeek && (
                     <span className="text-[10px] opacity-60 mr-0.5">
                       {dayOfWeekShort[date.getDay()]}
                     </span>

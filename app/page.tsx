@@ -51,6 +51,7 @@ export default function HomePage() {
   const [hiddenEventIds, setHiddenEventIds] = useState<string[]>([]);
   const [showHidden, setShowHidden] = useState<boolean>(false);
   const [showDaysOfWeek, setShowDaysOfWeek] = useState<boolean>(false);
+  const [alignWeekends, setAlignWeekends] = useState<boolean>(false);
   const [createOpen, setCreateOpen] = useState<boolean>(false);
   const [createTitle, setCreateTitle] = useState<string>("");
   const [createStartDate, setCreateStartDate] = useState<string>("");
@@ -232,6 +233,9 @@ export default function HomePage() {
           }
           if (data.showDaysOfWeek !== undefined) {
             setShowDaysOfWeek(data.showDaysOfWeek);
+          }
+          if (data.alignWeekends !== undefined) {
+            setAlignWeekends(data.alignWeekends);
           }
           if (data.showHidden !== undefined) {
             setShowHidden(data.showHidden);
@@ -415,6 +419,7 @@ export default function HomePage() {
             selectedCalendarIds,
             hiddenEventIds,
             showDaysOfWeek,
+            alignWeekends,
             showHidden,
             calendarColors,
           }),
@@ -429,6 +434,7 @@ export default function HomePage() {
     selectedCalendarIds,
     hiddenEventIds,
     showDaysOfWeek,
+    alignWeekends,
     showHidden,
     calendarColors,
   ]);
@@ -862,6 +868,17 @@ export default function HomePage() {
                             />
                             <span>Show days of week</span>
                           </label>
+                          <label className="flex items-center gap-2 text-sm cursor-pointer hover:bg-accent p-2 rounded">
+                            <input
+                              type="checkbox"
+                              className="accent-foreground"
+                              checked={alignWeekends}
+                              onChange={(e) =>
+                                setAlignWeekends(e.target.checked)
+                              }
+                            />
+                            <span>Align weekends</span>
+                          </label>
                           {hiddenEventIds.length > 0 && (
                             <label className="flex items-center gap-2 text-sm cursor-pointer hover:bg-accent p-2 rounded">
                               <input
@@ -1045,6 +1062,7 @@ export default function HomePage() {
           writableCalendars={writableCalendars}
           writableAccountsWithCalendars={writableAccountsWithCalendars}
           showDaysOfWeek={showDaysOfWeek}
+          alignWeekends={alignWeekends}
           onDayClick={(dateKey) => {
             if (status === "authenticated") {
               createDateFromDayClick.current = dateKey;
