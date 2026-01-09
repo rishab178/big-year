@@ -3,7 +3,7 @@ CREATE TABLE "User" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "name" TEXT,
     "email" TEXT,
-    "emailVerified" DATETIME,
+    "emailVerified" TIMESTAMPTZ(3),
     "image" TEXT
 );
 
@@ -29,7 +29,7 @@ CREATE TABLE "Session" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "sessionToken" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
-    "expires" DATETIME NOT NULL,
+    "expires" TIMESTAMPTZ(3) NOT NULL,
     CONSTRAINT "Session_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -37,7 +37,20 @@ CREATE TABLE "Session" (
 CREATE TABLE "VerificationToken" (
     "identifier" TEXT NOT NULL,
     "token" TEXT NOT NULL,
-    "expires" DATETIME NOT NULL
+    "expires" TIMESTAMPTZ(3) NOT NULL
+);
+
+CREATE TABLE "UserPreferences" (
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+  "userId" TEXT NOT NULL UNIQUE,
+  "selectedCalendarIds" TEXT NOT NULL DEFAULT '[]',
+  "hiddenEventIds" TEXT NOT NULL DEFAULT '[]',
+  "showDaysOfWeek" BOOLEAN NOT NULL DEFAULT true,
+  "showHidden" BOOLEAN NOT NULL DEFAULT false,
+  "calendarColors" TEXT NOT NULL DEFAULT '{}',
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+  CONSTRAINT "UserPreferences_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"(id) ON DELETE CASCADE
 );
 
 -- CreateIndex
