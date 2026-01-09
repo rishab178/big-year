@@ -514,7 +514,7 @@ export function YearCalendar({
       <div className="relative min-h-full w-full">
         <div
           ref={gridRef}
-          className="grid min-h-full w-full bg-border p-px"
+          className="grid min-h-full w-full bg-border dark:!bg-[hsl(0,0%,12%)] p-px"
           suppressHydrationWarning
           style={{
             gridTemplateColumns: `repeat(${gridDims.cols}, 1fr)`,
@@ -546,12 +546,13 @@ export function YearCalendar({
                 key={key}
                 data-day-cell="1"
                 className={cn(
-                  "relative bg-background p-1 min-w-0 min-h-0 overflow-hidden",
+                  "relative bg-background dark:!bg-[hsl(0,0%,6%)] p-1 min-w-0 min-h-0 overflow-hidden",
                   !isMobile && "aspect-square",
                   isWeekend &&
-                    'bg-white before:content-[""] before:absolute before:inset-0 before:bg-[rgba(0,0,0,0.02)] before:pointer-events-none',
+                    'bg-white dark:!bg-[hsl(0,0%,8%)] before:content-[""] before:absolute before:inset-0 before:bg-[rgba(0,0,0,0.02)] dark:before:bg-transparent before:pointer-events-none',
                   isToday && "ring-1 ring-primary",
-                  isFirstOfMonth && "border-l-2 border-foreground"
+                  isFirstOfMonth &&
+                    "border-l-2 border-[hsl(0,0%,85%)] dark:border-[hsl(0,0%,20%)]"
                 )}
                 title={date.toDateString()}
                 onClick={(e) => {
@@ -561,7 +562,7 @@ export function YearCalendar({
                 }}
               >
                 {isFirstOfMonth && cellWidth > 60 && (
-                  <div className="absolute top-0 left-0 bg-black text-white text-[10px] leading-none uppercase tracking-wide px-1.5 py-0.5">
+                  <div className="absolute top-0 left-0 bg-foreground text-background text-[10px] leading-none uppercase tracking-wide px-1.5 py-0.5">
                     {monthShort[date.getMonth()]}
                   </div>
                 )}
@@ -710,10 +711,9 @@ export function YearCalendar({
                     }}
                   >
                     <div
-                      className="truncate rounded-sm px-1 text-[10px] leading-[14px] shadow-sm"
+                      className="truncate rounded-sm px-1 text-[10px] leading-[14px] shadow-sm text-white dark:text-black"
                       style={{
                         backgroundColor: bg || "hsl(var(--secondary))",
-                        color: "#ffffff",
                         height: laneHeight - 2,
                         lineHeight: `${laneHeight - 4}px`,
                       }}
@@ -751,7 +751,7 @@ export function YearCalendar({
           <div
             ref={popoverRef}
             className={cn(
-              "border bg-card shadow-lg pointer-events-auto z-50",
+              "border border-[hsl(0,0%,85%)] dark:border-[hsl(0,0%,20%)] bg-[hsl(0,0%,99%)] dark:bg-[hsl(0,0%,10%)] shadow-lg pointer-events-auto z-50",
               isMobile
                 ? "fixed bottom-0 left-0 right-0 w-full rounded-t-3xl rounded-b-none max-h-[80vh] overflow-y-auto transition-transform"
                 : "fixed rounded-md w-full max-w-md"
@@ -879,7 +879,7 @@ export function YearCalendar({
                   {menuOpen && (
                     <div
                       className={cn(
-                        "w-48 bg-card border rounded-md shadow-lg z-50 py-1",
+                        "w-48 bg-[hsl(0,0%,99%)] dark:bg-[hsl(0,0%,10%)] border border-[hsl(0,0%,85%)] dark:border-[hsl(0,0%,20%)] rounded-md shadow-lg z-50 py-1",
                         isMobile ? "fixed" : "absolute right-0 top-full mt-1"
                       )}
                       style={
@@ -1166,7 +1166,10 @@ export function YearCalendar({
             >
               <Button
                 variant="outline"
-                className={cn(isMobile && "flex-1")}
+                className={cn(
+                  isMobile && "flex-1",
+                  "bg-transparent border-[hsl(0,0%,85%)] dark:border-[hsl(0,0%,20%)]"
+                )}
                 onClick={() => {
                   setIsEditing(false);
                   setPopover({ event: null, x: 0, y: 0 });
@@ -1229,7 +1232,7 @@ export function YearCalendar({
         <>
           <div className="fixed inset-0 bg-background/60 z-40" aria-hidden />
           {isMobile ? (
-            <div className="fixed bottom-0 left-0 right-0 w-full rounded-t-3xl rounded-b-none border bg-card shadow-lg pointer-events-auto z-50 px-6 py-6 text-center">
+            <div className="fixed bottom-0 left-0 right-0 w-full rounded-t-3xl rounded-b-none border border-[hsl(0,0%,85%)] dark:border-[hsl(0,0%,20%)] bg-[hsl(0,0%,99%)] dark:bg-[hsl(0,0%,10%)] shadow-lg pointer-events-auto z-50 px-6 py-6 text-center">
               <div className="text-xl font-medium mb-1">Big Year</div>
               <div className="text-base text-muted-foreground mb-4">
                 A calendar for all-day events.
@@ -1262,7 +1265,7 @@ export function YearCalendar({
             </div>
           ) : (
             <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
-              <div className="w-[400px] max-w-[80vw] rounded-md border bg-card p-5 md:p-12 text-center shadow-sm pointer-events-auto">
+              <div className="w-[400px] max-w-[80vw] rounded-md border border-[hsl(0,0%,85%)] dark:border-[hsl(0,0%,20%)] bg-[hsl(0,0%,99%)] dark:bg-[hsl(0,0%,10%)] p-5 md:p-12 text-center shadow-sm pointer-events-auto">
                 <div className="text-lg font-medium mb-1">Big Year</div>
                 <div className="text-sm text-muted-foreground mb-4">
                   A calendar for all-day events.

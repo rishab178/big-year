@@ -25,6 +25,7 @@ import {
   Calendar as CalendarIcon,
   Trash2,
 } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { formatDateKey, cn } from "@/lib/utils";
 import { CalendarListItem } from "@/types/calendar";
 
@@ -713,7 +714,7 @@ export default function HomePage() {
 
   return (
     <div className="h-screen w-screen flex flex-col">
-      <div className="grid grid-cols-3 items-center p-3">
+      <div className="grid grid-cols-3 items-center p-3 bg-[hsl(0,0%,99%)] dark:bg-[hsl(0,0%,8%)] border-b border-[hsl(0,0%,85%)] dark:border-[hsl(0,0%,20%)]">
         <div className="flex items-center gap-2">
           <Button
             variant="ghost"
@@ -749,10 +750,11 @@ export default function HomePage() {
           </Button>
         </div>
         <div className="flex items-center justify-end gap-2">
+          <ThemeToggle />
           <Button
             variant="outline"
             size="icon"
-            className="rounded-full"
+            className="rounded-full bg-transparent hover:bg-[rgba(255,255,255,0.1)] dark:hover:bg-[rgba(255,255,255,0.1)]"
             onClick={() => setCreateOpen(true)}
             disabled={status !== "authenticated"}
             aria-label="Create event"
@@ -782,7 +784,7 @@ export default function HomePage() {
           <div
             ref={createModalRef}
             className={cn(
-              "border bg-card shadow-lg pointer-events-auto z-50",
+              "border border-[hsl(0,0%,85%)] dark:border-[hsl(0,0%,20%)] bg-[hsl(0,0%,99%)] dark:bg-[hsl(0,0%,10%)] shadow-lg pointer-events-auto z-50",
               isMobile
                 ? "fixed bottom-0 left-0 right-0 w-full rounded-t-3xl rounded-b-none max-h-[80vh] overflow-y-auto transition-transform"
                 : "fixed rounded-md w-full max-w-md"
@@ -1061,7 +1063,7 @@ export default function HomePage() {
           >
             <Button
               variant="outline"
-              className={cn(isMobile && "flex-1")}
+              className={cn(isMobile && "flex-1", "bg-transparent border-[hsl(0,0%,85%)] dark:border-[hsl(0,0%,20%)]")}
               onClick={() => setCreateOpen(false)}
               disabled={createSubmitting}
             >
@@ -1090,11 +1092,11 @@ export default function HomePage() {
             aria-hidden
           />
           <aside
-            className="fixed inset-y-0 left-0 z-50 w-72 max-w-[80vw] bg-card border-r shadow-lg flex flex-col"
+            className="fixed inset-y-0 left-0 z-50 w-72 max-w-[80vw] bg-[hsl(0,0%,99%)] dark:bg-[hsl(0,0%,10%)] border-r border-[hsl(0,0%,85%)] dark:border-[hsl(0,0%,20%)] shadow-lg flex flex-col"
             role="dialog"
             aria-label="Menu"
           >
-            <div className="p-3 border-b flex items-center justify-between relative">
+            <div className="p-3 border-b border-[hsl(0,0%,85%)] dark:border-[hsl(0,0%,20%)] flex items-center justify-between relative">
               <div className="font-semibold">Calendars</div>
               <div className="flex items-center gap-1">
                 <Button
@@ -1129,7 +1131,7 @@ export default function HomePage() {
                           onClick={() => setSettingsDropdownOpen(false)}
                           aria-hidden
                         />
-                        <div className="absolute right-0 top-full mt-1 w-56 bg-card border rounded-md shadow-lg z-20 p-2 space-y-2">
+                        <div className="absolute right-0 top-full mt-1 w-56 bg-[hsl(0,0%,99%)] dark:bg-[hsl(0,0%,10%)] border border-[hsl(0,0%,85%)] dark:border-[hsl(0,0%,20%)] rounded-md shadow-lg z-20 p-2 space-y-2">
                           <label className="flex items-center gap-2 text-sm cursor-pointer hover:bg-accent p-2 rounded">
                             <input
                               type="checkbox"
@@ -1250,7 +1252,7 @@ export default function HomePage() {
                 <div className="px-2 py-3">
                   <Button
                     variant="outline"
-                    className="w-full justify-center gap-2 rounded-full"
+                    className="w-full justify-center gap-2 rounded-full bg-transparent hover:bg-[rgba(255,255,255,0.1)] dark:hover:bg-[rgba(255,255,255,0.1)]"
                     onClick={() => {
                       // Persist existing accountIds so we can auto-add the new account's calendars after linking
                       try {
@@ -1278,11 +1280,11 @@ export default function HomePage() {
                 </div>
               )}
             </div>
-            <div className="p-3 border-t">
+            <div className="p-3 border-t border-[hsl(0,0%,85%)] dark:border-[hsl(0,0%,20%)]">
               {status === "authenticated" ? (
                 <>
                   <Button
-                    className="w-full justify-center gap-2 rounded-full"
+                    className="w-full justify-center gap-2 rounded-full bg-transparent hover:bg-[rgba(255,255,255,0.1)] dark:hover:bg-[rgba(255,255,255,0.1)]"
                     variant="outline"
                     onClick={() => {
                       setSidebarOpen(false);
