@@ -1,6 +1,6 @@
 # Big Year
 
-Full-screen yearly calendar that shows only all-day events from your Google Calendar. Built with Next.js (App Router), Tailwind CSS, and shadcn-style UI components.
+Yearly calendar that only shows all-day events from your Google Calendar.
 
 ## Quickstart
 
@@ -109,6 +109,7 @@ Even if you're the only user, you need to grant yourself the proper IAM role:
 7. **Important**: After publishing, wait 5-10 minutes for changes to propagate
 
 **If the consent screen isn't configured yet:**
+
 - You'll see a setup wizard - choose "External" user type and fill out the required fields
 - See the troubleshooting guide for detailed setup steps
 

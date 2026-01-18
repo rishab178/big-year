@@ -2,6 +2,7 @@
 import { useSession, signIn, signOut } from "next-auth/react";
 import { useEffect, useMemo, useState, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -66,12 +67,14 @@ export default function HomePage() {
   const startDateInputRef = useRef<HTMLInputElement | null>(null);
   const endDateInputRef = useRef<HTMLInputElement | null>(null);
   const preferencesLoaded = useRef<boolean>(false);
-  const [preferencesLoadedState, setPreferencesLoadedState] = useState<boolean>(false);
+  const [preferencesLoadedState, setPreferencesLoadedState] =
+    useState<boolean>(false);
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const createModalRef = useRef<HTMLDivElement | null>(null);
   const [createDragOffset, setCreateDragOffset] = useState<number>(0);
   const [createIsDragging, setCreateIsDragging] = useState<boolean>(false);
-  const [createIsAnimatingIn, setCreateIsAnimatingIn] = useState<boolean>(false);
+  const [createIsAnimatingIn, setCreateIsAnimatingIn] =
+    useState<boolean>(false);
   const createDragStartY = useRef<number>(0);
   const createDragStartOffset = useRef<number>(0);
 
@@ -282,7 +285,9 @@ export default function HomePage() {
     if (createOpen && isMobile) {
       setCreateIsAnimatingIn(true);
       setCreateIsDragging(false);
-      setCreateDragOffset(typeof window !== "undefined" ? window.innerHeight : 1000);
+      setCreateDragOffset(
+        typeof window !== "undefined" ? window.innerHeight : 1000
+      );
       const timeout = setTimeout(() => {
         setCreateDragOffset(0);
         setTimeout(() => setCreateIsAnimatingIn(false), 300);
@@ -306,11 +311,11 @@ export default function HomePage() {
       if (createSubmitting) return;
       const touch = e.touches[0];
       const target = e.target as HTMLElement;
-      
+
       const isHeaderElement =
         target.closest('[aria-label="Close"]') ||
         target.closest("button[class*='p-1']");
-      
+
       // Don't start dragging if clicking a button
       if (isHeaderElement) return;
 
@@ -343,7 +348,7 @@ export default function HomePage() {
       const isHeaderElement =
         target.closest('[aria-label="Close"]') ||
         target.closest("button[class*='p-1']");
-      
+
       setCreateIsDragging(false);
 
       const threshold = Math.min(100, window.innerHeight * 0.2);
@@ -353,7 +358,7 @@ export default function HomePage() {
       } else {
         setCreateDragOffset(0);
       }
-      
+
       // Don't prevent default if clicking a button, so onClick can fire
       if (!isHeaderElement) {
         e.preventDefault();
@@ -369,7 +374,13 @@ export default function HomePage() {
       modal.removeEventListener("touchmove", handleTouchMove);
       modal.removeEventListener("touchend", handleTouchEnd);
     };
-  }, [isMobile, createSubmitting, createIsDragging, createDragOffset, createOpen]);
+  }, [
+    isMobile,
+    createSubmitting,
+    createIsDragging,
+    createDragOffset,
+    createOpen,
+  ]);
 
   // Handle calendar selection when both calendars and preferences are loaded
   // This runs when preferences finish loading (if calendars are already loaded)
@@ -384,12 +395,12 @@ export default function HomePage() {
     ) {
       processedCalendarSelectionRef.current = true;
       const allIds = calendars.map((c) => c.id);
-      
+
       // Check if we have a saved selection from preferences
       // selectedCalendarIds from preferences will be set when preferences load
       // We need to check the actual state at this point
       const currentSelection = selectedCalendarIds;
-      
+
       // If we have no saved selection (empty array), auto-select all for first-time user
       if (currentSelection.length === 0) {
         setSelectedCalendarIds(allIds);
@@ -712,6 +723,152 @@ export default function HomePage() {
     }
   };
 
+  // Show public homepage when not authenticated
+  if (status !== "authenticated") {
+    return (
+      <div className="min-h-screen flex flex-col bg-background">
+        <header className="border-b border-[hsl(0,0%,85%)] dark:border-[hsl(0,0%,20%)]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
+              <div className="flex items-center">
+                <h1 className="text-xl font-semibold">Big Year</h1>
+              </div>
+              <div className="flex items-center gap-3">
+                <Button
+                  onClick={() => signIn("google")}
+                  size="lg"
+                  className="rounded-full px-6"
+                >
+                  Sign in with Google
+                </Button>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <main className="flex-1">
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+            <div className="text-center">
+              <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-6">
+                Your entire year,
+                <br />
+                <span className="text-muted-foreground">at a glance</span>
+              </h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
+                Display your all-day events from Google Calendar in one elegant
+                interface.{" "}
+                <span className="hidden sm:inline">
+                  Plan ahead with confidence, and never miss important dates.
+                </span>
+              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
+                <Button
+                  onClick={() => signIn("google")}
+                  size="lg"
+                  className="text-lg px-8 py-6 rounded-full"
+                >
+                  Get Started
+                </Button>
+              </div>
+              <div className="w-full mb-0 sm:mb-0">
+                <div className="w-full rounded-lg overflow-hidden border border-[hsl(0,0%,85%)] dark:border-[hsl(0,0%,20%)] shadow-lg">
+                  <Image
+                    src="/hero-image.png"
+                    alt="Big Year calendar application screenshot"
+                    width={3476}
+                    height={2183}
+                    className="w-full h-auto"
+                    priority
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div
+              className="mt-16 sm:mt-24 grid grid-cols-1 md:grid-cols-3 gap-8"
+              id="features"
+            >
+              <div className="text-center p-6 rounded-lg border border-[hsl(0,0%,85%)] dark:border-[hsl(0,0%,20%)]">
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-4">
+                  <CalendarIcon className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">All-Day Events</h3>
+                <p className="text-muted-foreground">
+                  See all your Google Calendar all-day events displayed across
+                  the entire year in a single, comprehensive view.
+                </p>
+              </div>
+
+              <div className="text-center p-6 rounded-lg border border-[hsl(0,0%,85%)] dark:border-[hsl(0,0%,20%)]">
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-4">
+                  <Clock className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Easy Planning</h3>
+                <p className="text-muted-foreground">
+                  Navigate through years effortlessly, create new events, and
+                  manage your calendar directly from the interface.
+                </p>
+              </div>
+
+              <div className="text-center p-6 rounded-lg border border-[hsl(0,0%,85%)] dark:border-[hsl(0,0%,20%)]">
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-4">
+                  <Settings className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Customizable</h3>
+                <p className="text-muted-foreground">
+                  Choose which calendars to display, customize colors, and
+                  adjust settings to match your preferences.
+                </p>
+              </div>
+            </div>
+          </section>
+        </main>
+
+        <footer className="border-t border-[hsl(0,0%,85%)] dark:border-[hsl(0,0%,20%)] mt-auto">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
+                <p className="text-sm text-muted-foreground">
+                  © {new Date().getFullYear()} Big Year. All rights reserved.
+                </p>
+                <span className="hidden sm:inline text-muted-foreground">
+                  •
+                </span>
+                <p className="text-sm text-muted-foreground">
+                  Created by{" "}
+                  <Link
+                    href="https://www.gabrielvaldivia.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-foreground transition-colors underline underline-offset-4"
+                  >
+                    Gabriel Valdivia
+                  </Link>
+                </p>
+              </div>
+              <div className="flex items-center gap-4">
+                <Link
+                  href="/privacy"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Privacy Policy
+                </Link>
+                <span className="text-muted-foreground">•</span>
+                <Link
+                  href="/terms"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Terms of Service
+                </Link>
+              </div>
+            </div>
+          </div>
+        </footer>
+      </div>
+    );
+  }
+
+  // Show calendar interface when authenticated
   return (
     <div className="h-screen w-screen flex flex-col">
       <div className="grid grid-cols-3 items-center p-3 bg-[hsl(0,0%,99%)] dark:bg-[hsl(0,0%,8%)] border-b border-[hsl(0,0%,85%)] dark:border-[hsl(0,0%,20%)]">
@@ -720,7 +877,6 @@ export default function HomePage() {
             variant="ghost"
             aria-label="Open menu"
             onClick={() => setSidebarOpen(true)}
-            disabled={status !== "authenticated"}
             className="text-2xl p-2 hover:bg-transparent"
           >
             ☰
@@ -756,13 +912,8 @@ export default function HomePage() {
             size="icon"
             className="rounded-full bg-transparent hover:bg-[rgba(255,255,255,0.1)] dark:hover:bg-[rgba(255,255,255,0.1)]"
             onClick={() => setCreateOpen(true)}
-            disabled={status !== "authenticated"}
             aria-label="Create event"
-            title={
-              status === "authenticated"
-                ? "Create event"
-                : "Sign in to create events"
-            }
+            title="Create event"
           >
             <Plus className="h-4 w-4" />
           </Button>
@@ -796,8 +947,8 @@ export default function HomePage() {
                     transition: createIsDragging
                       ? "none"
                       : createIsAnimatingIn
-                        ? "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
-                        : "transform 0.3s ease-out",
+                      ? "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+                      : "transform 0.3s ease-out",
                   }
                 : {
                     top: "50%",
@@ -810,12 +961,12 @@ export default function HomePage() {
             aria-label="Create event"
             onClick={(e) => e.stopPropagation()}
           >
-          <div
-            className={cn(
-              "flex items-center justify-between",
-              isMobile ? "px-6 pt-6 pb-4" : "px-4 pt-4 pb-2"
-            )}
-          >
+            <div
+              className={cn(
+                "flex items-center justify-between",
+                isMobile ? "px-6 pt-6 pb-4" : "px-4 pt-4 pb-2"
+              )}
+            >
               <div
                 className={cn(
                   isMobile ? "text-lg font-semibold" : "font-semibold"
@@ -837,250 +988,248 @@ export default function HomePage() {
               >
                 <X className={cn(isMobile ? "h-5 w-5" : "h-4 w-4")} />
               </button>
-          </div>
-          <div
-            className={cn(
-              "space-y-3",
-              isMobile ? "px-6 pb-4" : "px-4 pt-2 pb-4"
-            )}
-          >
-                <div className="flex items-center gap-3">
-                  <div
-                    className={cn(
-                      "flex-shrink-0 flex items-center justify-center text-muted-foreground",
-                      isMobile ? "w-6 h-6" : "w-5 h-5"
-                    )}
-                  >
-                    <Plus className={cn(isMobile ? "h-5 w-5" : "h-4 w-4")} />
-                  </div>
-                  <input
-                    className={cn(
-                      "flex-1 border-0 bg-transparent px-0 py-1 focus:outline-none focus:ring-0 placeholder:text-muted-foreground",
-                      isMobile ? "text-base" : "text-sm"
-                    )}
-                    placeholder="Event title"
-                    value={createTitle}
-                    onChange={(e) => setCreateTitle(e.target.value)}
-                    disabled={createSubmitting}
-                    autoFocus={!isMobile}
+            </div>
+            <div
+              className={cn(
+                "space-y-3",
+                isMobile ? "px-6 pb-4" : "px-4 pt-2 pb-4"
+              )}
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className={cn(
+                    "flex-shrink-0 flex items-center justify-center text-muted-foreground",
+                    isMobile ? "w-6 h-6" : "w-5 h-5"
+                  )}
+                >
+                  <Plus className={cn(isMobile ? "h-5 w-5" : "h-4 w-4")} />
+                </div>
+                <input
+                  className={cn(
+                    "flex-1 border-0 bg-transparent px-0 py-1 focus:outline-none focus:ring-0 placeholder:text-muted-foreground",
+                    isMobile ? "text-base" : "text-sm"
+                  )}
+                  placeholder="Event title"
+                  value={createTitle}
+                  onChange={(e) => setCreateTitle(e.target.value)}
+                  disabled={createSubmitting}
+                  autoFocus={!isMobile}
+                />
+              </div>
+              <div className="flex items-center gap-3">
+                <div
+                  className={cn(
+                    "flex-shrink-0 flex items-center justify-center text-muted-foreground",
+                    isMobile ? "w-6 h-6" : "w-5 h-5"
+                  )}
+                >
+                  <CalendarIcon
+                    className={cn(isMobile ? "h-5 w-5" : "h-4 w-4")}
                   />
                 </div>
-                <div className="flex items-center gap-3">
-                  <div
-                    className={cn(
-                      "flex-shrink-0 flex items-center justify-center text-muted-foreground",
-                      isMobile ? "w-6 h-6" : "w-5 h-5"
-                    )}
-                  >
-                    <CalendarIcon
-                      className={cn(isMobile ? "h-5 w-5" : "h-4 w-4")}
-                    />
-                  </div>
-                  <div className="flex-1 flex items-center justify-between">
-                    <div className="flex items-center">
-                      <input
-                        ref={startDateInputRef}
-                        type="date"
-                        className={cn(
-                          "border-0 bg-transparent px-0 py-1 focus:outline-none focus:ring-0 [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none",
-                          isMobile ? "text-base w-28" : "text-sm w-24"
-                        )}
-                        value={createStartDate}
-                        onChange={(e) => {
-                          const v = e.target.value;
-                          setCreateStartDate(v);
-                          if (
-                            createHasEndDate &&
-                            createEndDate &&
-                            v &&
-                            createEndDate < v
-                          ) {
-                            setCreateEndDate(v);
-                          }
-                        }}
-                        onClick={(e) => {
-                          e.currentTarget.showPicker?.();
-                          e.currentTarget.focus();
-                        }}
-                        disabled={createSubmitting}
-                      />
-                      {createHasEndDate && (
-                        <>
-                          <span className="text-muted-foreground">–</span>
-                          <input
-                            ref={endDateInputRef}
-                            type="date"
-                            className={cn(
-                              "border-0 bg-transparent px-0 py-1 focus:outline-none focus:ring-0 ml-2 [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none",
-                              isMobile ? "text-base w-28" : "text-sm"
-                            )}
-                            value={createEndDate}
-                            min={createStartDate || undefined}
-                            onChange={(e) => setCreateEndDate(e.target.value)}
-                            onClick={(e) => {
-                              e.currentTarget.showPicker?.();
-                              e.currentTarget.focus();
-                            }}
-                            disabled={createSubmitting}
-                          />
-                        </>
+                <div className="flex-1 flex items-center justify-between">
+                  <div className="flex items-center">
+                    <input
+                      ref={startDateInputRef}
+                      type="date"
+                      className={cn(
+                        "border-0 bg-transparent px-0 py-1 focus:outline-none focus:ring-0 [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none",
+                        isMobile ? "text-base w-28" : "text-sm w-24"
                       )}
-                    </div>
-                    {createHasEndDate ? (
-                      <button
-                        type="button"
-                        className={cn(
-                          "text-muted-foreground hover:text-foreground flex-shrink-0",
-                          isMobile ? "p-1" : "text-xs"
-                        )}
-                        onClick={() => {
-                          setCreateHasEndDate(false);
-                          setCreateEndDate("");
-                        }}
-                        disabled={createSubmitting}
-                        aria-label="Remove end date"
-                      >
-                        {isMobile ? (
-                          <Trash2 className="h-5 w-5" />
-                        ) : (
-                          "Remove"
-                        )}
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        className={cn(
-                          "text-muted-foreground hover:text-foreground",
-                          isMobile ? "text-sm" : "text-xs"
-                        )}
-                        onClick={() => {
-                          setCreateHasEndDate(true);
-                          if (!createEndDate) setCreateEndDate(createStartDate);
-                        }}
-                        disabled={createSubmitting}
-                      >
-                        Add end date
-                      </button>
+                      value={createStartDate}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        setCreateStartDate(v);
+                        if (
+                          createHasEndDate &&
+                          createEndDate &&
+                          v &&
+                          createEndDate < v
+                        ) {
+                          setCreateEndDate(v);
+                        }
+                      }}
+                      onClick={(e) => {
+                        e.currentTarget.showPicker?.();
+                        e.currentTarget.focus();
+                      }}
+                      disabled={createSubmitting}
+                    />
+                    {createHasEndDate && (
+                      <>
+                        <span className="text-muted-foreground">–</span>
+                        <input
+                          ref={endDateInputRef}
+                          type="date"
+                          className={cn(
+                            "border-0 bg-transparent px-0 py-1 focus:outline-none focus:ring-0 ml-2 [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none",
+                            isMobile ? "text-base w-28" : "text-sm"
+                          )}
+                          value={createEndDate}
+                          min={createStartDate || undefined}
+                          onChange={(e) => setCreateEndDate(e.target.value)}
+                          onClick={(e) => {
+                            e.currentTarget.showPicker?.();
+                            e.currentTarget.focus();
+                          }}
+                          disabled={createSubmitting}
+                        />
+                      </>
                     )}
                   </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div
-                    className={cn(
-                      "flex-shrink-0 flex items-center justify-center",
-                      isMobile ? "w-6 h-6" : "w-5 h-5"
-                    )}
-                  >
-                    {createCalendarId && calendarColors[createCalendarId] ? (
-                      <div
-                        className={cn(
-                          "rounded-full",
-                          isMobile ? "w-5 h-5" : "w-3 h-3"
-                        )}
-                        style={{
-                          backgroundColor: calendarColors[createCalendarId],
-                        }}
-                      />
-                    ) : (
-                      <div
-                        className={cn(
-                          "rounded-full bg-muted",
-                          isMobile ? "w-5 h-5" : "w-3 h-3"
-                        )}
-                      />
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <Select
-                      value={createCalendarId}
-                      onValueChange={setCreateCalendarId}
+                  {createHasEndDate ? (
+                    <button
+                      type="button"
+                      className={cn(
+                        "text-muted-foreground hover:text-foreground flex-shrink-0",
+                        isMobile ? "p-1" : "text-xs"
+                      )}
+                      onClick={() => {
+                        setCreateHasEndDate(false);
+                        setCreateEndDate("");
+                      }}
+                      disabled={createSubmitting}
+                      aria-label="Remove end date"
+                    >
+                      {isMobile ? <Trash2 className="h-5 w-5" /> : "Remove"}
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      className={cn(
+                        "text-muted-foreground hover:text-foreground",
+                        isMobile ? "text-sm" : "text-xs"
+                      )}
+                      onClick={() => {
+                        setCreateHasEndDate(true);
+                        if (!createEndDate) setCreateEndDate(createStartDate);
+                      }}
                       disabled={createSubmitting}
                     >
-                      <SelectTrigger
-                        className={cn(
-                          "w-full border-0 bg-transparent px-0 py-1 h-auto shadow-none focus:ring-0 justify-start gap-1",
-                          isMobile ? "text-base" : "text-sm"
-                        )}
-                      >
-                        <SelectValue placeholder="Select a calendar" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {writableCalendars.length > 0
-                          ? writableAccountsWithCalendars.map(
-                              ({ accountId, email, list }) => (
-                                <SelectGroup key={accountId || email}>
-                                  <SelectLabel>
-                                    {email && email.length
-                                      ? email
-                                      : accountId || "Account"}
-                                  </SelectLabel>
-                                  {list.map((c) => (
-                                    <SelectItem key={c.id} value={c.id}>
-                                      {c.summary}
-                                    </SelectItem>
-                                  ))}
-                                </SelectGroup>
-                              )
-                            )
-                          : calendars.map((c) => (
-                              <SelectItem key={c.id} value={c.id}>
-                                {(c.accountEmail
-                                  ? `${c.accountEmail} — `
-                                  : "") + c.summary}
-                              </SelectItem>
-                            ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                      Add end date
+                    </button>
+                  )}
                 </div>
-                {writableCalendars.length === 0 && calendars.length > 0 && (
-                  <div
-                    className={cn(
-                      "text-muted-foreground",
-                      isMobile ? "text-sm pl-8" : "text-xs pl-8"
-                    )}
+              </div>
+              <div className="flex items-center gap-3">
+                <div
+                  className={cn(
+                    "flex-shrink-0 flex items-center justify-center",
+                    isMobile ? "w-6 h-6" : "w-5 h-5"
+                  )}
+                >
+                  {createCalendarId && calendarColors[createCalendarId] ? (
+                    <div
+                      className={cn(
+                        "rounded-full",
+                        isMobile ? "w-5 h-5" : "w-3 h-3"
+                      )}
+                      style={{
+                        backgroundColor: calendarColors[createCalendarId],
+                      }}
+                    />
+                  ) : (
+                    <div
+                      className={cn(
+                        "rounded-full bg-muted",
+                        isMobile ? "w-5 h-5" : "w-3 h-3"
+                      )}
+                    />
+                  )}
+                </div>
+                <div className="flex-1">
+                  <Select
+                    value={createCalendarId}
+                    onValueChange={setCreateCalendarId}
+                    disabled={createSubmitting}
                   >
-                    No writable calendars found; creating may fail on read-only
-                    calendars.
-                  </div>
-                )}
-                {createError && (
-                  <div
-                    className={cn(
-                      "text-destructive",
-                      isMobile ? "text-base pl-8" : "text-sm pl-8"
-                    )}
-                  >
-                    {createError}
-                  </div>
-                )}
-          </div>
-          <div
-            className={cn(
-              "flex gap-2 items-center",
-              isMobile ? "px-6 pb-6" : "px-4 pb-4 justify-end"
-            )}
-          >
-            <Button
-              variant="outline"
-              className={cn(isMobile && "flex-1", "bg-transparent border-[hsl(0,0%,85%)] dark:border-[hsl(0,0%,20%)]")}
-              onClick={() => setCreateOpen(false)}
-              disabled={createSubmitting}
+                    <SelectTrigger
+                      className={cn(
+                        "w-full border-0 bg-transparent px-0 py-1 h-auto shadow-none focus:ring-0 justify-start gap-1",
+                        isMobile ? "text-base" : "text-sm"
+                      )}
+                    >
+                      <SelectValue placeholder="Select a calendar" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {writableCalendars.length > 0
+                        ? writableAccountsWithCalendars.map(
+                            ({ accountId, email, list }) => (
+                              <SelectGroup key={accountId || email}>
+                                <SelectLabel>
+                                  {email && email.length
+                                    ? email
+                                    : accountId || "Account"}
+                                </SelectLabel>
+                                {list.map((c) => (
+                                  <SelectItem key={c.id} value={c.id}>
+                                    {c.summary}
+                                  </SelectItem>
+                                ))}
+                              </SelectGroup>
+                            )
+                          )
+                        : calendars.map((c) => (
+                            <SelectItem key={c.id} value={c.id}>
+                              {(c.accountEmail ? `${c.accountEmail} — ` : "") +
+                                c.summary}
+                            </SelectItem>
+                          ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              {writableCalendars.length === 0 && calendars.length > 0 && (
+                <div
+                  className={cn(
+                    "text-muted-foreground",
+                    isMobile ? "text-sm pl-8" : "text-xs pl-8"
+                  )}
+                >
+                  No writable calendars found; creating may fail on read-only
+                  calendars.
+                </div>
+              )}
+              {createError && (
+                <div
+                  className={cn(
+                    "text-destructive",
+                    isMobile ? "text-base pl-8" : "text-sm pl-8"
+                  )}
+                >
+                  {createError}
+                </div>
+              )}
+            </div>
+            <div
+              className={cn(
+                "flex gap-2 items-center",
+                isMobile ? "px-6 pb-6" : "px-4 pb-4 justify-end"
+              )}
             >
-              Cancel
-            </Button>
-            <Button
-              className={cn(isMobile && "flex-1")}
-              onClick={onCreateEvent}
-              disabled={
-                createSubmitting ||
-                status !== "authenticated" ||
-                !createTitle.trim()
-              }
-            >
-              {createSubmitting ? "Creating…" : "Create"}
-            </Button>
-          </div>
+              <Button
+                variant="outline"
+                className={cn(
+                  isMobile && "flex-1",
+                  "bg-transparent border-[hsl(0,0%,85%)] dark:border-[hsl(0,0%,20%)]"
+                )}
+                onClick={() => setCreateOpen(false)}
+                disabled={createSubmitting}
+              >
+                Cancel
+              </Button>
+              <Button
+                className={cn(isMobile && "flex-1")}
+                onClick={onCreateEvent}
+                disabled={
+                  createSubmitting ||
+                  status !== "authenticated" ||
+                  !createTitle.trim()
+                }
+              >
+                {createSubmitting ? "Creating…" : "Create"}
+              </Button>
+            </div>
           </div>
         </>
       )}
@@ -1380,4 +1529,3 @@ export default function HomePage() {
     </div>
   );
 }
-
