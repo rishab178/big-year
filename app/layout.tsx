@@ -5,6 +5,9 @@ import React from "react";
 export const metadata = {
   title: "Big Year",
   description: "Full-year calendar with Google all-day events",
+  icons: {
+    icon: "/favicon.png",
+  },
   ...(process.env.GOOGLE_SITE_VERIFICATION && {
     verification: {
       google: process.env.GOOGLE_SITE_VERIFICATION,
