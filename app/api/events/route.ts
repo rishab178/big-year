@@ -120,6 +120,7 @@ export async function GET(req: Request) {
         summary: e.summary || "(Untitled)",
         startDate: e.start.date as string,
         endDate: e.end?.date as string,
+        colorId: e.colorId || "0",
       }))
   );
 

@@ -5,13 +5,14 @@ RUN apk add --no-cache openssl
 
 WORKDIR /app
 
-COPY . .
-
 ENV NEXT_TELEMETRY_DISABLED=1
 
+COPY package.json package.json
+COPY prisma/ prisma/
 RUN npm install
-RUN npm run build
 
+COPY . .
+RUN npm run build
 
 
 # RUN STAGE

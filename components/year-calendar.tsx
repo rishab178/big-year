@@ -177,6 +177,20 @@ export function YearCalendar({
   const todayKey = formatDateKey(new Date());
   const dateMap = useMemo(() => expandEventsToDateMap(events), [events]);
   const rawDays = useMemo(() => generateYearDays(year), [year]);
+  // Color map from https://google-calendar-simple-api.readthedocs.io/en/latest/colors.html
+  const eventColors: { [key: string]: string } = {
+    "1": "#7986CB",
+    "2": "#33B679",
+    "3": "#8E24AA",
+    "4": "#E67C73",
+    "5": "#F6BF26",
+    "6": "#F4511E",
+    "7": "#039BE5",
+    "8": "#616161",
+    "9": "#3F51B5",
+    "10": "#0B8043",
+    "11": "#D50000", 
+  };
   const days = useMemo(() => {
     if (!alignWeekends) return rawDays;
 
@@ -828,9 +842,8 @@ function formatDisplayRange(startIsoDate: string, endIsoDate: string) {
                 const span = seg.endCol - seg.startCol;
                 const width = span * cellSizePx.w + (span - 1) * gap;
                 const key = `${seg.ev.id}:${row}:${seg.startCol}-${seg.endCol}:${lane}`;
-                const bg = seg.ev.calendarId
-                  ? calendarColors[seg.ev.calendarId]
-                  : undefined;
+                const bg = (seg.ev.colorId ? eventColors[seg.ev.colorId] : undefined) 
+                        ?? (seg.ev.calendarId ? calendarColors[seg.ev.calendarId] : undefined);
                 bars.push(
                   <div
                     key={key}

@@ -1,6 +1,6 @@
 services:
   app:
-    build: .
+    image: big_year:latest
     container_name: big-year-app
     ports:
       - "17891:3000"

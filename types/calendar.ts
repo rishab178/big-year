@@ -13,5 +13,6 @@ export type AllDayEvent = {
   startDate: string; // YYYY-MM-DD
   endDate: string; // YYYY-MM-DD (exclusive)
   calendarId?: string;
+  colorId?: string;
 };
 
